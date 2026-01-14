@@ -1,6 +1,9 @@
 package cat.institutmarianao.repository.impl;
 
+import java.time.temporal.ValueRange;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.springframework.stereotype.Repository;
@@ -38,6 +41,35 @@ public class InMemoryMedicineRepository implements MedicineRepository {
 	@Override
 	public Set<Medicine> getAllMedicines() {
 		return medicines;
+	}
+
+	@Override
+	public Set<Medicine> getMedicamentsByFilter(Map<String, List<String>> filterParams) {
+		Set<Medicine> filteredMedicines = new HashSet<>();
+
+		Set<String> criterias = filterParams.keySet();
+
+		long minStock = Long.parseLong(filterParams.get("stock").get(0));
+		long maxStock = Long.parseLong(filterParams.get("stock").get(1));
+
+		ValueRange stockRange = ValueRange.of(minStock, maxStock);
+
+		for (Medicine medicine : medicines) {
+			boolean passFilter = true;
+
+			if (criterias.contains("producer")) {
+				passFilter = filterParams.get("producer").contains(medicine.getProducer());
+			}
+
+			if (criterias.contains("stock")) {
+				passFilter = passFilter && stockRange.isValidValue(medicine.getStockQuantity());
+			}
+
+			if (passFilter) {
+				filteredMedicines.add(medicine);
+			}
+		}
+		return filteredMedicines;
 	}
 
 }
