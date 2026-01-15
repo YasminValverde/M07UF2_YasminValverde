@@ -44,7 +44,33 @@ public class InMemoryMedicineRepository implements MedicineRepository {
 	}
 
 	@Override
-	public Set<Medicine> getMedicamentsByFilter(Map<String, List<String>> filterParams) {
+	public Medicine getMedicineById(String medicineId) {
+		Medicine medicineById = null;
+		for (Medicine medicine : medicines) {
+			if (medicine != null && medicine.getMedicineId() != null && medicine.getMedicineId().equals(medicineId)) {
+				medicineById = medicine;
+				break;
+			}
+		}
+		if (medicineById == null) {
+			throw new IllegalArgumentException("No s’han trobat medicines amb el codi: " + medicineId);
+		}
+		return medicineById;
+	}
+
+	@Override
+	public Set<Medicine> getMedicinesByCategory(String category) {
+		Set<Medicine> medicinesByCategory = new HashSet<>();
+		for (Medicine medicine : medicines) {
+			if (category.equalsIgnoreCase(medicine.getCategory())) {
+				medicinesByCategory.add(medicine);
+			}
+		}
+		return medicinesByCategory;
+	}
+
+	@Override
+	public Set<Medicine> getMedicinesByFilter(Map<String, List<String>> filterParams) {
 		Set<Medicine> filteredMedicines = new HashSet<>();
 
 		Set<String> criterias = filterParams.keySet();
@@ -69,7 +95,17 @@ public class InMemoryMedicineRepository implements MedicineRepository {
 				filteredMedicines.add(medicine);
 			}
 		}
+
 		return filteredMedicines;
 	}
 
+	@Override
+	public void update(Medicine medicineById) {
+		// Do nothing, because its in memory
+	}
+
+	@Override
+	public void addMedicine(Medicine medicine) {
+		medicines.add(medicine);
+	}
 }
