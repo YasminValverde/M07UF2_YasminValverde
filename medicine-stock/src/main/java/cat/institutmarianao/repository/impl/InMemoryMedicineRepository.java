@@ -75,19 +75,21 @@ public class InMemoryMedicineRepository implements MedicineRepository {
 
 		Set<String> criterias = filterParams.keySet();
 
-		long minStock = Long.parseLong(filterParams.get("stock").get(0));
-		long maxStock = Long.parseLong(filterParams.get("stock").get(1));
-
-		ValueRange stockRange = ValueRange.of(minStock, maxStock);
+		if (criterias.contains("stock")) {
+			long minStock = Long.parseLong(filterParams.get("stock").get(0));
+			long maxStock = Long.parseLong(filterParams.get("stock").get(1));
+			ValueRange stockRange = ValueRange.of(minStock, maxStock);
+		}
 
 		for (Medicine medicine : medicines) {
-			boolean passFilter = true;
 
+			boolean passFilter = true;
 			if (criterias.contains("producer")) {
 				passFilter = filterParams.get("producer").contains(medicine.getProducer());
 			}
 
 			if (criterias.contains("stock")) {
+				ValueRange stockRange = null;
 				passFilter = passFilter && stockRange.isValidValue(medicine.getStockQuantity());
 			}
 
